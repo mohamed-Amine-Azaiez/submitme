@@ -1,0 +1,31 @@
+.art {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.art-title {
+    margin: 0;
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.white-ribbon {
+  height: 40px;
+}
+.woman-img {
+  margin-left: auto;
+  height: 80%;
+  width: 90%;
+}
+
+.art-descp {
+  margin: 0;
+  font-size: 18px;
+  color: #ffffff;
+  text-transform: capitalize;
+}
