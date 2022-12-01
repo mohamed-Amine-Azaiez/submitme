@@ -1,10 +1,10 @@
-import { useCallback, useReducer } from "react";
+import { useCallback, useReducer } from 'react';
 
-const reducerFn = (state, action) => {
+const formReducer = (state, action) => {
   switch (action.type) {
-    case "INPUT-CHANGE":
+    case 'INPUT_CHANGE':
       let formIsValid = true;
-      for (let inputId in state.inputs) {
+      for (const inputId in state.inputs) {
         if (!state.inputs[inputId]) {
           continue;
         }
@@ -18,45 +18,42 @@ const reducerFn = (state, action) => {
         ...state,
         inputs: {
           ...state.inputs,
-          [action.inputId]: {
-            value: action.value,
-            isValid: action.isValid,
-          },
+          [action.inputId]: { value: action.value, isValid: action.isValid }
         },
-        isValid: formIsValid,
+        isValid: formIsValid
       };
-    case "LOAD-DATA":
+    case 'SET_DATA':
       return {
         inputs: action.inputs,
-        isValid: action.formIsValid,
+        isValid: action.formIsValid
       };
     default:
       return state;
   }
 };
 
-export const useFormHook = (initialInputs, initialFormValidty) => {
-  const [formState, dispatch] = useReducer(reducerFn, {
+export const useForm = (initialInputs, initialFormValidity) => {
+  const [formState, dispatch] = useReducer(formReducer, {
     inputs: initialInputs,
-    isValid: initialFormValidty,
+    isValid: initialFormValidity
   });
 
   const inputHandler = useCallback((id, value, isValid) => {
     dispatch({
-      type: "INPUT-CHANGE",
-      inputId: id,
+      type: 'INPUT_CHANGE',
       value: value,
       isValid: isValid,
+      inputId: id
     });
   }, []);
 
-  const loadData = useCallback((loadedInputs, formLoadedValidity) => {
+  const setFormData = useCallback((inputData, formValidity) => {
     dispatch({
-      type: "LOAD-DATA",
-      inputs: loadedInputs,
-      formIsValid: formLoadedValidity,
+      type: 'SET_DATA',
+      inputs: inputData,
+      formIsValid: formValidity
     });
   }, []);
 
-  return [formState, inputHandler, loadData];
+  return [formState, inputHandler, setFormData];
 };
