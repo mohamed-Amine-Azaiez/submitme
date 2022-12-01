@@ -1,6 +1,6 @@
 import "./Auth.css";
 import { useState, useContext } from "react";
-import { useFormHook } from "../../shared/hooks/Form-Hook";
+import { useForm } from "../../shared/hooks/Form-Hook";
 import { useHttpClient } from "../../shared/hooks/Http-Hook";
 import { AuthContext } from "../../shared/context/auth-context";
 
@@ -21,9 +21,9 @@ import Container from "../../shared/UIElement/Container/Container";
 import Art from "../../shared/UIElement/Art/Art";
 const Auth = (props) => {
   const auth = useContext(AuthContext);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoginMode, setIsLoginMode] = useState(true);
   const { isLoading, error, sendRequest, clearErrorHandler } = useHttpClient();
-  const [formState, inputHandler, loadData] = useFormHook(
+  const [formState, inputHandler, setFormData] = useForm(
     {
       email: { value: "", isValid: false },
       password: { value: "", isValid: false },
@@ -33,18 +33,17 @@ const Auth = (props) => {
 
   const switchModeHandler = (event) => {
     event.preventDefault();
-    if (!isLoggedIn) {
-      loadData(
+    if (!isLoginMode) {
+      setFormData(
         {
-          ...formState,
+          ...formState.inputs,
           name: undefined,
           image: undefined,
         },
-        formState.inputs.email.isValid,
-        formState.inputs.password.isValid
+        formState.inputs.email.isValid && formState.inputs.password.isValid
       );
     } else {
-      loadData(
+      setFormData(
         {
           ...formState.inputs,
           name: { value: "", isValid: false },
@@ -53,13 +52,13 @@ const Auth = (props) => {
         false
       );
     }
-    setIsLoggedIn((prevMode) => !prevMode);
+    setIsLoginMode((prevMode) => !prevMode);
   };
 
   const authSubmitHandler = async (event) => {
     event.preventDefault();
     console.log(formState.inputs);
-    if (isLoggedIn) {
+    if (isLoginMode) {
       try {
         const responseData = await sendRequest(
           "http://localhost:5000/api/users/login",
@@ -97,47 +96,62 @@ const Auth = (props) => {
           <Art />
         </div>
         <div className="form-container">
-          <Card className="authentication">
-            {isLoading && <LoadingSpinner asOverlay />}
-            <form onSubmit={authSubmitHandler}>
-              {!isLoggedIn && (
+          <div className="form">
+            <div className="form-tabs">
+              <span
+                className="tab"
+                inverse
+                onClick={switchModeHandler}
+                disabled
+              >
+                Sign in
+              </span>
+              <span
+                className="tab"
+                inverse
+                onClick={switchModeHandler}
+                disabled={isLoginMode}
+              >
+                Sign up
+              </span>
+            </div>
+            <Card className="authentication">
+              {isLoading && <LoadingSpinner asOverlay />}
+              <form onSubmit={authSubmitHandler}>
+                {!isLoginMode && (
+                  <Input
+                    id="name"
+                    label="Name"
+                    element="input"
+                    validators={[VALIDATOR_REQUIRE()]}
+                    errorText="please enter a valid name format"
+                    onInput={inputHandler}
+                  />
+                )}
                 <Input
-                  id="name"
-                  label="Name"
+                  id="email"
+                  label="Email"
                   element="input"
-                  validators={[VALIDATOR_REQUIRE()]}
-                  errorText="please enter a valid name format"
+                  validators={[VALIDATOR_EMAIL()]}
+                  errorText="please enter a valid email format"
                   onInput={inputHandler}
                 />
-              )}
-              <Input
-                id="email"
-                label="Email"
-                element="input"
-                validators={[VALIDATOR_EMAIL()]}
-                errorText="please enter a valid email format"
-                onInput={inputHandler}
-              />
-              <Input
-                id="password"
-                element="input"
-                type="password"
-                label="Password"
-                validators={[VALIDATOR_MINLENGTH(8), VALIDATOR_MAXLENGTH(16)]}
-                errorText="this password is not valid"
-                onInput={inputHandler}
-              />
-              {!isLoggedIn && (
-                <ImageUpload center id="image" onInput={inputHandler} />
-              )}
-              <Button disabled={!formState.isValid}>
-                {isLoggedIn ? "LOGIN" : "SIGNUP"}
-              </Button>
-            </form>
-            <Button inverse onClick={switchModeHandler}>
-              {isLoggedIn ? "SIGNUP" : "LOGIN"}
-            </Button>
-          </Card>
+                <Input
+                  id="password"
+                  element="input"
+                  type="password"
+                  label="Password"
+                  validators={[VALIDATOR_MINLENGTH(8), VALIDATOR_MAXLENGTH(16)]}
+                  errorText="this password is not valid"
+                  onInput={inputHandler}
+                />
+                {!isLoginMode && (
+                  <ImageUpload center id="image" onInput={inputHandler} />
+                )}
+                <Button disabled={!formState.isValid}>Confirme</Button>
+              </form>
+            </Card>
+          </div>
         </div>
       </Container>
     </>
