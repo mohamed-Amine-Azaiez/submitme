@@ -99,8 +99,6 @@ const Auth = (props) => {
         <div className="form-container">
           <Card className="authentication">
             {isLoading && <LoadingSpinner asOverlay />}
-            <h2 className="authenticaton__header">Authentication Required</h2>
-            <hr />
             <form onSubmit={authSubmitHandler}>
               {!isLoggedIn && (
                 <Input
