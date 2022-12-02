@@ -1,20 +1,40 @@
 import React, { useLayoutEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { gsap } from "gsap";
-
+import gsap from "gsap";
 import "./Button.css";
 
 const Button = (props) => {
-  const boxRef = useRef();
-
+  const button = useRef();
+  const tl = useRef();
   useLayoutEffect(() => {
-    // Refs allow you to access DOM nodes
-    console.log(boxRef); // { current: div.box }
-    // then we can animate them like so...
-    gsap.to(boxRef.current, {
-      rotation: "+=360",
+    const ctx = gsap.context(() => {
+      tl.current = gsap
+        .timeline()
+        .to(
+          button.current,
+          {
+            rotate: 10,
+            duration: 0.3,
+          },
+          
+        )
+        .to(
+          button.current,
+          {
+            rotate: -10,
+            duration: 0.3,
+          },
+          
+        ).to(
+          button.current,
+          {
+            rotate: 0,
+            duration: 0.3,
+          },
+          
+        );
     });
-  }, []);
+  });
 
   if (props.href) {
     return (
@@ -43,7 +63,7 @@ const Button = (props) => {
   }
   return (
     <button
-     ref={boxRef}
+      ref={button}
       className={`button button--${props.size || "default"} ${
         props.inverse && "button--inverse"
       } ${props.danger && "button--danger"}`}

@@ -1,8 +1,11 @@
 import "./Auth.css";
-import { useState, useContext } from "react";
+import { useState, useContext, useRef, useLayoutEffect } from "react";
 import { useForm } from "../../shared/hooks/Form-Hook";
 import { useHttpClient } from "../../shared/hooks/Http-Hook";
 import { AuthContext } from "../../shared/context/auth-context";
+import { gsap } from "gsap";
+import leftWoman from "../../assets/img/left-woman.png";
+import rightMan from "../../assets/img/right-man.png";
 
 import Input from "../../shared/FormElements/Input";
 import Button from "../../shared/FormElements/Button";
@@ -20,6 +23,8 @@ import Card from "../../shared/UIElement/Card";
 import Container from "../../shared/UIElement/Container/Container";
 import Art from "../../shared/UIElement/Art/Art";
 const Auth = (props) => {
+
+ 
   const auth = useContext(AuthContext);
   const [isLoginMode, setIsLoginMode] = useState(true);
   const { isLoading, error, sendRequest, clearErrorHandler } = useHttpClient();
@@ -102,7 +107,7 @@ const Auth = (props) => {
                 className="tab"
                 inverse
                 onClick={switchModeHandler}
-                disabled
+                disabled={!isLoginMode}
               >
                 Sign in
               </span>
@@ -119,23 +124,27 @@ const Auth = (props) => {
               {isLoading && <LoadingSpinner asOverlay />}
               <form onSubmit={authSubmitHandler}>
                 {!isLoginMode && (
+                  <div className="name-input">
+                    <Input
+                      id="name"
+                      label="Name"
+                      element="input"
+                      validators={[VALIDATOR_REQUIRE()]}
+                      onInput={inputHandler}
+                    />
+                  </div>
+                )}
+                <div className="name-input">
                   <Input
-                    id="name"
-                    label="Name"
+                    id="email"
+                    label="Email"
                     element="input"
-                    validators={[VALIDATOR_REQUIRE()]}
-                    errorText="please enter a valid name format"
+                    validators={[VALIDATOR_EMAIL()]}
+                    errorText="please enter a valid email format"
                     onInput={inputHandler}
                   />
-                )}
-                <Input
-                  id="email"
-                  label="Email"
-                  element="input"
-                  validators={[VALIDATOR_EMAIL()]}
-                  errorText="please enter a valid email format"
-                  onInput={inputHandler}
-                />
+                </div>
+
                 <Input
                   id="password"
                   element="input"
@@ -148,7 +157,7 @@ const Auth = (props) => {
                 {!isLoginMode && (
                   <ImageUpload center id="image" onInput={inputHandler} />
                 )}
-                <Button disabled={!formState.isValid}>Confirme</Button>
+                <Button>Confirme</Button>
               </form>
             </Card>
           </div>
